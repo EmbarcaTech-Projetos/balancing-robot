@@ -9,6 +9,7 @@
 ## Images and/or videos of the project in operation
 
 ### 1 - Basic setup and sensor and motor testing
+[MPU6050 Testing](https://www.youtube.com/watch?v=QhUIAeRodJI)
 
 ### 2 - Simplified Control
 
