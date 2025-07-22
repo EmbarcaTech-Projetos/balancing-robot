@@ -11,6 +11,8 @@
 ### 1 - Basic setup and sensor and motor testing
 [MPU6050 Testing](https://www.youtube.com/watch?v=QhUIAeRodJI)
 
+[Motors and Motor Driver Testing](https://youtube.com/shorts/PSPbVovtmwM)
+
 ### 2 - Simplified Control
 
 ### 3 - Fundamental Structure and Assembly
