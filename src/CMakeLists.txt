@@ -37,7 +37,9 @@ pico_sdk_init()
 
 add_executable(src 
 main.c 
-drivers/src/mpu6050_i2c.c)
+drivers/src/mpu6050_i2c.c
+drivers/src/motor.c
+)
 
 pico_set_program_name(src "src")
 pico_set_program_version(src "0.1")
@@ -58,6 +60,7 @@ target_include_directories(src PRIVATE
 # Add any user requested libraries
 target_link_libraries(src 
         hardware_i2c
+        hardware_pwm
         )
 
 pico_add_extra_outputs(src)
