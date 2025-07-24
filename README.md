@@ -13,6 +13,8 @@
 
 [Motors and Motor Driver Testing](https://youtube.com/shorts/PSPbVovtmwM)
 
+[Security Testing](https://www.youtube.com/shorts/c7ruEw9CDRs)
+
 ### 2 - Simplified Control
 
 ### 3 - Fundamental Structure and Assembly
