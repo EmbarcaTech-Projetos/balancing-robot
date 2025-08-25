@@ -21,7 +21,7 @@
 #define GYRO_SENS_250_DPS 131.0f
 
 // Store the current accelerometer sensitivity. Default is for ±2g range.
-static float accel_sensitivity = ACCEL_SENS_2G;
+static float accel_sensitivity = 16384.0f;
 
 // A static variable to hold the user's callback function.
 // A buffer to re-assemble the POST data from lwIP's parsed format.

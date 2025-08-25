@@ -13,6 +13,9 @@
 static char json_buffer[256];
 static int json_buffer_len = 0;
 
+static hal_imu_data_t imu_data;
+static float kp = 0.f;
+
 /**
  * @brief This function is called when a POST request begins.
  */
@@ -62,20 +65,21 @@ void httpd_post_finished(void *connection, char *response_uri, u16_t response_ur
 
     // --- Simple JSON "Parsing" ---
 
-    char* left_key = strstr(json_buffer, "\"speed_left\":");
-    if (left_key) {
-        float left_speed = atof(left_key + strlen("\"speed_left\":"));
-        printf("Parsed Left Motor Speed: %.2f\n", left_speed);
-    }
-
-    char* right_key = strstr(json_buffer, "\"speed_right\":");
-    if (right_key) {
-        float right_speed = atof(right_key + strlen("\"speed_right\":"));
-        printf("Parsed Right Motor Speed: %.2f\n", right_speed);
+    char* kp_key = strstr(json_buffer, "\"kp\":");
+    if (kp_key) {
+        kp = atof(kp_key + strlen("\"kp\":"));
+        printf("KP constant change: %.2f\n", kp);
     }
     
     // Set the response URI. Redirecting back to the main page.
     strncpy(response_uri, "/index.shtml", response_uri_len);
+}
+
+void imu_data_process(hal_imu_data_t *imu_data)
+{
+    float x = imu_data->accel_x_g * kp;
+    printf("%d\n", x);
+    hal_motor_set_speeds(x, -x);
 }
 
 int main() {
@@ -94,6 +98,10 @@ int main() {
     
     int led_counter = 0;
     while (true) {
+
+        hal_imu_get_data(&imu_data);
+        imu_data_process(&imu_data);
+
         if(led_counter++ % 10 == 0) {
             hal_toggle_onboard_led();
             printf("Send POST requests to http://%s/command\n", hal_wifi_get_ip_address_str());

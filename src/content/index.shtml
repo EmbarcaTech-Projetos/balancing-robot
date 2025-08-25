@@ -23,17 +23,10 @@
     
     <form id="controlForm">
         <div class="slider-container">
-            <label for="left">Motor Esquerdo: <output id="left_val">0</output>%</label>
-            <input type="range" id="left" name="speed_left" min="-1.0" max="1.0" value="0.0" step="0.1"
-                   oninput="left_val.value = Math.round(this.value * 100)">
+            <label for="left">Constante KP: <output id="kp_val">0</output>%</label>
+            <input type="range" id="kp_id" name="kp" min="-1.0" max="1.0" value="0.0" step="0.01"
+                   oninput="kp_val.value = Math.round(this.value * 100)">
         </div>
-        
-        <div class="slider-container">
-            <label for="right">Motor Direito: <output id="right_val">0</output>%</label>
-            <input type="range" id="right" name="speed_right" min="-1.0" max="1.0" value="0.0" step="0.1"
-                   oninput="right_val.value = Math.round(this.value * 100)">
-        </div>
-        
         <input type="submit" value="Enviar Comando">
     </form>
 </div>
@@ -46,13 +39,11 @@
         event.preventDefault();
 
         // Get the current values from the sliders
-        const leftValue = parseFloat(document.getElementById('left').value);
-        const rightValue = parseFloat(document.getElementById('right').value);
+        const kpValue = parseFloat(document.getElementById('kp_id').value);
 
         // Create a JavaScript object with the data
         const jsonData = {
-            speed_left: leftValue,
-            speed_right: rightValue
+            kp: kpValue,
         };
 
         // Use the fetch API to send the POST request
