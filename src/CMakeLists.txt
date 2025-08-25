@@ -39,6 +39,7 @@ add_executable(src
 main.c 
 drivers/src/mpu6050_i2c.c
 drivers/src/motor.c
+hal/src/hal.c
 )
 
 pico_set_program_name(src "src")
@@ -48,6 +49,11 @@ pico_set_program_version(src "0.1")
 pico_enable_stdio_uart(src 0)
 pico_enable_stdio_usb(src 1)
 
+pico_add_library(pico_httpd_content NOFLAG)
+pico_set_lwip_httpd_content(pico_httpd_content INTERFACE
+       ${CMAKE_CURRENT_LIST_DIR}/content/index.shtml
+       )
+
 # Add the standard library to the build
 target_link_libraries(src
         pico_stdlib)
@@ -55,12 +61,16 @@ target_link_libraries(src
 # Add the standard include files to the build
 target_include_directories(src PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/drivers/include
+        ${CMAKE_CURRENT_LIST_DIR}/hal/include
 )
 
 # Add any user requested libraries
 target_link_libraries(src 
         hardware_i2c
         hardware_pwm
+        pico_cyw43_arch_lwip_threadsafe_background
+        pico_lwip_http
+        pico_httpd_content
         )
 
 pico_add_extra_outputs(src)

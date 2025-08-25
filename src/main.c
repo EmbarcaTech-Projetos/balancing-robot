@@ -1,39 +1,105 @@
-#include <stdio.h>
 #include "pico/stdlib.h"
-#include "hardware/i2c.h"
-#include "motor.h"
-#include "mpu6050_i2c.h" 
-#include "math.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h> // For atof()
+
+#include "pico/cyw43_arch.h"
+#include "lwip/ip4_addr.h"
+#include "lwip/init.h"
+
+#include "hal.h"
+
+// A buffer to store the incoming JSON data
+static char json_buffer[256];
+static int json_buffer_len = 0;
+
+/**
+ * @brief This function is called when a POST request begins.
+ */
+err_t httpd_post_begin(void *connection, const char *uri, const char *http_request,
+                       u16_t http_request_len, int content_len, char *response_uri,
+                       u16_t response_uri_len, u8_t *post_auto_wnd)
+{
+    // We only want to handle POST requests to "/command"
+    if (strcmp(uri, "/command") == 0) {
+        // Clear the buffer for new data
+        memset(json_buffer, 0, sizeof(json_buffer));
+        json_buffer_len = 0;
+
+        // Check if the data will fit in our buffer
+        if (content_len <= sizeof(json_buffer)) {
+            *post_auto_wnd = 1; // Let lwIP manage the TCP window
+            return ERR_OK;
+        }
+    }
+
+    return ERR_VAL;
+}
+
+/**
+ * @brief This function is called with chunks of POST data.
+ */
+err_t httpd_post_receive_data(void *connection, struct pbuf *p)
+{
+    if (p != NULL) {
+        // Check for buffer overflow
+        if (json_buffer_len + p->len <= sizeof(json_buffer)) {
+            memcpy(json_buffer + json_buffer_len, p->payload, p->len);
+            json_buffer_len += p->len;
+        }
+        // Free the pbuf
+        pbuf_free(p);
+    }
+    return ERR_OK;
+}
+
+/**
+ * @brief This function is called when the POST request is finished.
+ */
+void httpd_post_finished(void *connection, char *response_uri, u16_t response_uri_len)
+{
+    printf("POST request finished. Received data:\n%s\n", json_buffer);
+
+    // --- Simple JSON "Parsing" ---
+
+    char* left_key = strstr(json_buffer, "\"speed_left\":");
+    if (left_key) {
+        float left_speed = atof(left_key + strlen("\"speed_left\":"));
+        printf("Parsed Left Motor Speed: %.2f\n", left_speed);
+    }
+
+    char* right_key = strstr(json_buffer, "\"speed_right\":");
+    if (right_key) {
+        float right_speed = atof(right_key + strlen("\"speed_right\":"));
+        printf("Parsed Right Motor Speed: %.2f\n", right_speed);
+    }
+    
+    // Set the response URI. Redirecting back to the main page.
+    strncpy(response_uri, "/index.shtml", response_uri_len);
+}
 
 int main() {
-    stdio_init_all();
-    mpu6050_setup_i2c();
-    mpu6050_reset();
-    motor_setup();
-    // Here you can blink a led or print to indicate that program flashed and is running
-
-    int16_t accel_raw[3], gyro_raw[3], temp;
-    float accel[3];
-
-    while (true) {
-        mpu6050_read_raw(accel_raw, gyro_raw, &temp);
-
-        for (uint8_t i = 0; i < 3; ++i) {
-            accel[i] = (float)accel_raw[i] / 16384.0f;
+    if (!hal_init("XXXX", "XXXX")) {
+        while(1) {
+            hal_set_onboard_led(true);
+            sleep_ms(100);
+            hal_set_onboard_led(false);
+            sleep_ms(100);
         }
+    }
 
+    hal_http_server_init();
 
-        // Threshold test on pitch (example using X-axis)
-        // Adjust threshold as needed (e.g., 0.5g ~ 30º)
-        // Inside the if/else you can blink led or print, so you have a feedback
-        if (fabsf(accel[0]) > 0.5f) {
-            motor_enable();
-            bool direction_test = accel[0] < 0; // direction based on tilt
-            motor_set_both_level(100 << 8, direction_test);
-         }
-        else { motor_set_both_level(0, false); }
-
-
+    printf("HTTP Server started. IP Address: %s\n", hal_wifi_get_ip_address_str());
+    
+    int led_counter = 0;
+    while (true) {
+        if(led_counter++ % 10 == 0) {
+            hal_toggle_onboard_led();
+            printf("Send POST requests to http://%s/command\n", hal_wifi_get_ip_address_str());
+        }
         sleep_ms(100);
     }
+
+    return 0;
 }

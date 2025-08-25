@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pico W Robot Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f0f0; }
+        .container { max-width: 400px; margin: auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        form { display: flex; flex-direction: column; gap: 20px; }
+        .slider-container { display: flex; flex-direction: column; align-items: center; }
+        label { font-weight: bold; margin-bottom: 5px; }
+        input[type=range] { width: 80%; }
+        output { font-weight: bold; color: #007BFF; }
+        input[type=submit] { padding: 10px 20px; font-size: 16px; color: white; background-color: #007BFF; border: none; border-radius: 5px; cursor: pointer; }
+        input[type=submit]:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Controle do Rob&ocirc; Pico W</h1>
+    
+    <form id="controlForm">
+        <div class="slider-container">
+            <label for="left">Motor Esquerdo: <output id="left_val">0</output>%</label>
+            <input type="range" id="left" name="speed_left" min="-1.0" max="1.0" value="0.0" step="0.1"
+                   oninput="left_val.value = Math.round(this.value * 100)">
+        </div>
+        
+        <div class="slider-container">
+            <label for="right">Motor Direito: <output id="right_val">0</output>%</label>
+            <input type="range" id="right" name="speed_right" min="-1.0" max="1.0" value="0.0" step="0.1"
+                   oninput="right_val.value = Math.round(this.value * 100)">
+        </div>
+        
+        <input type="submit" value="Enviar Comando">
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById('controlForm');
+
+    form.addEventListener('submit', function(event) {
+        // Prevent the default form submission which sends urlencoded data
+        event.preventDefault();
+
+        // Get the current values from the sliders
+        const leftValue = parseFloat(document.getElementById('left').value);
+        const rightValue = parseFloat(document.getElementById('right').value);
+
+        // Create a JavaScript object with the data
+        const jsonData = {
+            speed_left: leftValue,
+            speed_right: rightValue
+        };
+
+        // Use the fetch API to send the POST request
+        fetch('/command', {
+            method: 'POST',
+            // THIS HEADER IS CRITICAL!
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            // Convert the JavaScript object to a JSON string
+            body: JSON.stringify(jsonData),
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log('Success:', data);
+            alert('Comando enviado!');
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Falha ao enviar comando.');
+        });
+    });
+</script>
+
+</body>
+</html>
