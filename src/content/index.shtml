@@ -29,7 +29,7 @@
         </div>
 
         <div class="slider-container">
-            <label for="left">Deadzone: <output id="deadzone_val">0</output>%</label>
+            <label for="left">Deadzone: <output id="deadzone_val">0</output></label>
             <input type="range" id="deadzone_id" name="deadzone" min="0" max="65535" value="0" step="1"
                    oninput="deadzone_val.value = this.value">
         </div>
