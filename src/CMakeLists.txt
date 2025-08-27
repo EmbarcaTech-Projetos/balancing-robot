@@ -40,6 +40,8 @@ main.c
 drivers/src/mpu6050_i2c.c
 drivers/src/motor.c
 hal/src/hal.c
+apps/src/network.c
+apps/src/movement.c
 )
 
 pico_set_program_name(src "src")
@@ -62,6 +64,7 @@ target_link_libraries(src
 target_include_directories(src PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/drivers/include
         ${CMAKE_CURRENT_LIST_DIR}/hal/include
+        ${CMAKE_CURRENT_LIST_DIR}/apps/include
 )
 
 # Add any user requested libraries
