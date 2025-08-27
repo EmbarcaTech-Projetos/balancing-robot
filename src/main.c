@@ -16,6 +16,7 @@ static int json_buffer_len = 0;
 static hal_imu_data_t imu_data;
 static float kp = 0.f;
 static uint16_t deadzone = 0;
+static hal_imu_data_t initial_imu_data;
 
 /**
  * @brief This function is called when a POST request begins.
@@ -82,9 +83,21 @@ void httpd_post_finished(void *connection, char *response_uri, u16_t response_ur
     strncpy(response_uri, "/index.shtml", response_uri_len);
 }
 
-void imu_data_process(hal_imu_data_t *imu_data)
+void imu_data_process(hal_imu_data_t *imu_data, hal_imu_data_t *initial_imu_data)
 {
-    float x = imu_data->accel_x_g * kp;
+    float accel_x = imu_data->accel_x_g - initial_imu_data->accel_x_g;
+    float accel_y = imu_data->accel_y_g - initial_imu_data->accel_y_g;
+    float accel_z = imu_data->accel_z_g - initial_imu_data->accel_z_g;
+
+    float x = accel_x * kp;
+
+    printf("{\n");
+    printf("  Raw Accel: %f %f %f\n", imu_data->accel_x_g, imu_data->accel_y_g, imu_data->accel_z_g);
+    printf("  Accel: %f %f %f\n", accel_x, accel_y, accel_z);
+    printf("  Gyro: %f %f %f\n", imu_data->gyro_x_dps, imu_data->gyro_y_dps, imu_data->gyro_z_dps);
+    printf("  Speed: %f\n", x);
+    printf("}\n");
+
     hal_motor_set_speeds(x, -x, deadzone);
 }
 
@@ -101,12 +114,14 @@ int main() {
     hal_http_server_init();
 
     printf("HTTP Server started. IP Address: %s\n", hal_wifi_get_ip_address_str());
-    
+    hal_imu_get_data(&initial_imu_data);
+
     int led_counter = 0;
+
     while (true) {
 
         hal_imu_get_data(&imu_data);
-        imu_data_process(&imu_data);
+        imu_data_process(&imu_data, &initial_imu_data);
 
         if(led_counter++ % 10 == 0) {
             hal_toggle_onboard_led();
