@@ -26,6 +26,7 @@ err_t httpd_post_receive_data(void *connection, struct pbuf *p);
 void httpd_post_finished(void *connection, char *response_uri, u16_t response_uri_len);
 
 extern float kp, kd, ki;
+extern float complementary_filter_alpha;
 extern uint16_t deadzone;
 
 #endif

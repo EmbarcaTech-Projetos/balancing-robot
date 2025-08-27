@@ -11,7 +11,7 @@ static hal_imu_data_t imu_data;
 static hal_imu_data_t initial_imu_data;
 
 int main() {
-    if (!hal_init("XXXX", "XXXX")) {
+    if (!hal_init("REDEDOMARCOS", "45612300")) {
         while(1) {
             hal_set_onboard_led(true);
             sleep_ms(100);
@@ -33,6 +33,7 @@ int main() {
         constants_variable.kp = kp;
         constants_variable.kd = kd;
         constants_variable.ki = ki;
+        constants_variable.complementary_filter_alpha = complementary_filter_alpha;
 
         imu_data_process(&imu_data, &initial_imu_data, &constants_variable);
 

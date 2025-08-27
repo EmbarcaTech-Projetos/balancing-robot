@@ -29,6 +29,24 @@
         </div>
 
         <div class="slider-container">
+            <label for="left">Constante KD: <output id="kd_val">0</output>%</label>
+            <input type="range" id="kd_id" name="kd" min="-1.0" max="1.0" value="0.0" step="0.01"
+                   oninput="kd_val.value = Math.round(this.value * 100)">
+        </div>
+
+        <div class="slider-container">
+            <label for="left">Constante KI: <output id="ki_val">0</output>%</label>
+            <input type="range" id="ki_id" name="ki" min="-1.0" max="1.0" value="0.0" step="0.01"
+                   oninput="ki_val.value = Math.round(this.value * 100)">
+        </div>
+
+        <div class="slider-container">
+            <label for="left">Constante Alpha (Filtro Complementar): <output id="alpha_val">0</output>%</label>
+            <input type="range" id="alpha_id" name="alpha" min="0.0" max="1.0" value="0.0" step="0.01"
+                   oninput="alpha_val.value = Math.round(this.value * 100)">
+        </div>
+
+        <div class="slider-container">
             <label for="left">Deadzone: <output id="deadzone_val">0</output></label>
             <input type="range" id="deadzone_id" name="deadzone" min="0" max="65535" value="0" step="1"
                    oninput="deadzone_val.value = this.value">
@@ -46,11 +64,17 @@
 
         // Get the current values from the sliders
         const kpValue = parseFloat(document.getElementById('kp_id').value);
+        const kdValue = parseFloat(document.getElementById('kd_id').value);
+        const kiValue = parseFloat(document.getElementById('ki_id').value);
+        const alphaValue = parseFloat(document.getElementById('alpha_id').value);
         const deadzoneValue = parseInt(document.getElementById('deadzone_val').value);
 
         // Create a JavaScript object with the data
         const jsonData = {
             kp: kpValue,
+            kd: kdValue,
+            ki: kiValue,
+            alpha: alphaValue,
             deadzone: deadzoneValue,
         };
 

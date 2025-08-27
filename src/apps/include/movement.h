@@ -7,6 +7,7 @@
 typedef struct constants
 {
     float kp, kd, ki;
+    float complementary_filter_alpha;
     uint16_t deadzone;
 } constants;
 

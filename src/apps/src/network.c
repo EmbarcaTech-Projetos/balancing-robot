@@ -9,6 +9,7 @@ static int json_buffer_len = 0;
 
 uint16_t deadzone=0;
 float kp=0, kd=0, ki=0;
+float complementary_filter_alpha=0.98;
 
 /**
  * @brief This function is called when a POST request begins.
@@ -63,6 +64,24 @@ void httpd_post_finished(void *connection, char *response_uri, u16_t response_ur
     if (kp_key) {
         kp = atof(kp_key + strlen("\"kp\":"));
         printf("KP constant change: %.2f\n", kp);
+    }
+
+    char* kd_key = strstr(json_buffer, "\"kd\":");
+    if (kd_key) {
+        kd = atof(kd_key + strlen("\"kd\":"));
+        printf("KD constant change: %.2f\n", kd);
+    }
+
+    char* ki_key = strstr(json_buffer, "\"ki\":");
+    if (ki_key) {
+        ki = atof(ki_key + strlen("\"ki\":"));
+        printf("KI constant change: %.2f\n", ki);
+    }
+
+    char* alpha_key = strstr(json_buffer, "\"alpha\":");
+    if (alpha_key) {
+        complementary_filter_alpha = atof(alpha_key + strlen("\"alpha\":"));
+        printf("KD constant change: %.2f\n", complementary_filter_alpha);
     }
 
     char* deadzone_key = strstr(json_buffer, "\"deadzone\":");
