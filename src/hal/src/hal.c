@@ -93,7 +93,7 @@ void hal_toggle_onboard_led() {
 /**
  * @brief Sets motor speeds based on a float from -1.0 to 1.0.
  */
-void hal_motor_set_speeds(float speed_left, float speed_right) {
+void hal_motor_set_speeds(float speed_left, float speed_right, uint16_t deadzone) {
     // Clamp speeds to the valid range [-1.0, 1.0]
     if (speed_left > 1.0f) speed_left = 1.0f;
     if (speed_left < -1.0f) speed_left = -1.0f;
@@ -103,14 +103,22 @@ void hal_motor_set_speeds(float speed_left, float speed_right) {
     // --- Left Motor ---
     bool forward_left = (speed_left >= 0);
     // Convert float speed to 16-bit PWM level
+
     uint16_t level_left = (uint16_t)(fabs(speed_left) * 65535.0f);
-    motor_set_left_level(level_left, forward_left);
+    if(level_left >= deadzone)
+        motor_set_left_level(level_left, forward_left);
+    else
+        hal_motor_stop();
 
     // --- Right Motor ---
     bool forward_right = (speed_right >= 0);
     // Convert float speed to 16-bit PWM level
     uint16_t level_right = (uint16_t)(fabs(speed_right) * 65535.0f);
-    motor_set_right_level(level_right, forward_right);
+
+    if(level_right >= deadzone)
+        motor_set_right_level(level_right, forward_right);
+    else
+        hal_motor_stop();
 }
 
 /**

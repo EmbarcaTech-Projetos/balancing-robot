@@ -63,8 +63,9 @@ void hal_toggle_onboard_led();
  *
  * @param speed_left The desired speed for the left motor.
  * @param speed_right The desired speed for the right motor.
+ * @param deadzone The value which the motor starts working.
  */
-void hal_motor_set_speeds(float speed_left, float speed_right);
+void hal_motor_set_speeds(float speed_left, float speed_right, uint16_t deadzone);
 
 /**
  * @brief Stops both motors immediately.

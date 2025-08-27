@@ -15,6 +15,7 @@ static int json_buffer_len = 0;
 
 static hal_imu_data_t imu_data;
 static float kp = 0.f;
+static uint16_t deadzone = 0;
 
 /**
  * @brief This function is called when a POST request begins.
@@ -70,6 +71,12 @@ void httpd_post_finished(void *connection, char *response_uri, u16_t response_ur
         kp = atof(kp_key + strlen("\"kp\":"));
         printf("KP constant change: %.2f\n", kp);
     }
+
+    char* deadzone_key = strstr(json_buffer, "\"deadzone\":");
+    if (deadzone_key) {
+        deadzone = atoi(deadzone_key + strlen("\"deadzone\":"));
+        printf("Deadzone constant change: %.2f\n", deadzone);
+    }
     
     // Set the response URI. Redirecting back to the main page.
     strncpy(response_uri, "/index.shtml", response_uri_len);
@@ -78,8 +85,7 @@ void httpd_post_finished(void *connection, char *response_uri, u16_t response_ur
 void imu_data_process(hal_imu_data_t *imu_data)
 {
     float x = imu_data->accel_x_g * kp;
-    printf("%d\n", x);
-    hal_motor_set_speeds(x, -x);
+    hal_motor_set_speeds(x, -x, deadzone);
 }
 
 int main() {

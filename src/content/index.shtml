@@ -27,6 +27,12 @@
             <input type="range" id="kp_id" name="kp" min="-1.0" max="1.0" value="0.0" step="0.01"
                    oninput="kp_val.value = Math.round(this.value * 100)">
         </div>
+
+        <div class="slider-container">
+            <label for="left">Deadzone: <output id="deadzone_val">0</output>%</label>
+            <input type="range" id="deadzone_id" name="deadzone" min="0" max="65535" value="0" step="1"
+                   oninput="deadzone_val.value = this.value">
+        </div>
         <input type="submit" value="Enviar Comando">
     </form>
 </div>
@@ -40,10 +46,12 @@
 
         // Get the current values from the sliders
         const kpValue = parseFloat(document.getElementById('kp_id').value);
+        const deadzoneValue = parseInt(document.getElementById('deadzone_val').value);
 
         // Create a JavaScript object with the data
         const jsonData = {
             kp: kpValue,
+            deadzone: deadzoneValue,
         };
 
         // Use the fetch API to send the POST request
